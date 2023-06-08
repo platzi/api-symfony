@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
+    description: 'Entidad de las publicaciones con title, body y category',
     operations: [
         new Get(
             normalizationContext: ['groups' => ['post:read', 'post:read:item']],
@@ -45,22 +46,34 @@ class Post
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['post:read'])]
+    /**
+     * Campo ID, único y auto_increment
+     */
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['post:read', 'post:write'])]
     #[Assert\NotBlank]
+    /**
+     * Título de una publicación, frase
+     */
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['post:read:item', 'post:write'])]
     #[Assert\NotBlank]
+    /**
+     * Contenido de la publicación, 1200 palabras
+     */
     private ?string $body = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['post:read', 'post:write'])]
     #[Assert\NotBlank]
+    /**
+     * Campo de la categoría, relación ManyToOne
+     */
     private ?Category $category = null;
 
     public function getId(): ?int
@@ -86,6 +99,9 @@ class Post
     }
 
     #[Groups(['post:read:collection'])]
+    /**
+     * Resumen de la publicación, su función es mostrarse en los listados
+     */
     public function getSummary($len = 70): ?string
     {
         if (mb_strlen($this->body) <= $len) {
