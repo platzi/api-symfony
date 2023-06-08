@@ -22,16 +22,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new Get(
-            normalizationContext: ['groups' => ['read', 'read:item']],
+            normalizationContext: ['groups' => ['post:read', 'post:read:item']],
         ),
         new GetCollection(
-            normalizationContext: ['groups' => ['read', 'read:collection']],
+            normalizationContext: ['groups' => ['post:read', 'post:read:collection']],
         ),
         new Patch(),
         new Store(),
     ],
-    // normalizationContext: ['groups' => ['read']], // GET
-    denormalizationContext: ['groups' => ['write']], // POST, PUT, PATCH
+    denormalizationContext: ['groups' => ['post:write']], // POST, PUT, PATCH
     paginationItemsPerPage: 8
 )]
 #[ApiFilter(SearchFilter::class, properties: [
@@ -45,22 +44,22 @@ class Post
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read'])]
+    #[Groups(['post:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['read', 'write'])]
+    #[Groups(['post:read', 'post:write'])]
     #[Assert\NotBlank]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['read:item', 'write'])]
+    #[Groups(['post:read:item', 'post:write'])]
     #[Assert\NotBlank]
     private ?string $body = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read', 'write'])]
+    #[Groups(['post:read', 'post:write'])]
     #[Assert\NotBlank]
     private ?Category $category = null;
 
@@ -86,7 +85,7 @@ class Post
         return $this->body;
     }
 
-    #[Groups(['read:collection'])]
+    #[Groups(['post:read:collection'])]
     public function getSummary($len = 70): ?string
     {
         if (mb_strlen($this->body) <= $len) {
